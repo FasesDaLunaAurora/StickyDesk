@@ -168,3 +168,12 @@ Sugestões, melhorias e correções são bem-vindas.
 # 📄 Licença
 
 Este projeto está licenciado sob a licença MIT.
+
+
+# StickyDesk
+
+![Python](https://img.shields.io/badge/Python-3.11+-blue)
+![PySide6](https://img.shields.io/badge/PySide6-Qt-green)
+![License](https://img.shields.io/badge/license-MIT-orange)
+
+> Post-its digitais para sua área de trabalho.
