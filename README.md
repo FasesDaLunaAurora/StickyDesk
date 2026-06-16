@@ -1,10 +1,25 @@
 # StickyDesk
 
+![Python](https://img.shields.io/badge/Python-3.11+-blue)
+![PySide6](https://img.shields.io/badge/PySide6-Qt-green)
+![Platform](https://img.shields.io/badge/Platform-Windows-lightgrey)
+![License](https://img.shields.io/badge/License-MIT-orange)
+
 > Post-its digitais para sua área de trabalho.
 
-StickyDesk é uma aplicação desktop para Windows que permite criar e organizar notas flutuantes diretamente na área de trabalho, simulando a experiência dos tradicionais post-its físicos.
+StickyDesk é uma aplicação desktop desenvolvida em Python e PySide6 que permite criar post-its digitais diretamente na área de trabalho do Windows.
 
-O objetivo do projeto é fornecer uma ferramenta simples, leve e prática para anotações rápidas, lembretes e organização de tarefas diárias.
+Projetado para ser leve, rápido e intuitivo, o StickyDesk ajuda a organizar lembretes, ideias e tarefas sem interromper o fluxo de trabalho.
+
+---
+
+# 📸 Demonstração
+
+Em breve.
+
+<!-- Exemplo futuro -->
+
+<!-- ![StickyDesk Demo](docs/demo.gif) -->
 
 ---
 
@@ -44,16 +59,51 @@ O objetivo do projeto é fornecer uma ferramenta simples, leve e prática para a
 
 ---
 
+# 🏗️ Arquitetura
+
+O projeto segue uma arquitetura simples baseada em separação de responsabilidades, facilitando manutenção, testes e futuras expansões.
+
+```text
+UI
+ ├── Interface gráfica
+ ├── Componentes visuais
+ └── Eventos do usuário
+
+Services
+ ├── Regras de negócio
+ ├── Manipulação das notas
+ └── Fluxos da aplicação
+
+Models
+ ├── Estruturas de dados
+ └── Representação das notas
+
+Storage
+ ├── Leitura de arquivos
+ ├── Escrita de arquivos
+ └── Persistência JSON
+```
+
+---
+
 # 📂 Estrutura do Projeto
 
 ```text
 stickydesk
 │
 ├── app
-│   ├── ui
 │   ├── models
+│   │   └── note.py
+│   │
 │   ├── services
-│   └── storage
+│   │   └── note_service.py
+│   │
+│   ├── storage
+│   │   └── json_storage.py
+│   │
+│   └── ui
+│       ├── main_window.py
+│       └── sticky_note.py
 │
 ├── data
 │   └── notes.json
@@ -71,7 +121,7 @@ stickydesk
 
 # 🚀 Executando o Projeto
 
-## Instalação
+## Clone o repositório
 
 ```bash
 git clone https://github.com/seu-usuario/stickydesk.git
@@ -79,13 +129,13 @@ git clone https://github.com/seu-usuario/stickydesk.git
 cd stickydesk
 ```
 
-Instale as dependências:
+## Instale as dependências
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Execute:
+## Execute a aplicação
 
 ```bash
 python main.py
@@ -115,11 +165,25 @@ Ao reiniciar a aplicação, todas as notas são restauradas automaticamente.
 
 ---
 
+# 📚 Aprendizados
+
+Este projeto explora conceitos importantes do desenvolvimento desktop moderno com Python:
+
+* Desenvolvimento de interfaces gráficas com PySide6
+* Arquitetura em camadas
+* Programação orientada a objetos
+* Persistência de dados em JSON
+* Gerenciamento de estado local
+* Manipulação de eventos e interação com o usuário
+* Organização e escalabilidade de projetos desktop
+
+---
+
 # 🎯 Objetivo
 
-Este projeto nasceu da necessidade de uma ferramenta simples para organização pessoal, permitindo manter lembretes visíveis durante o trabalho sem depender de aplicações pesadas ou serviços externos.
+O StickyDesk nasceu da necessidade de uma ferramenta simples para organização pessoal, permitindo manter lembretes visíveis durante o trabalho sem depender de aplicações pesadas ou serviços externos.
 
-Além de resolver um problema real do dia a dia, o projeto serve como estudo de desenvolvimento desktop utilizando Python.
+Além de resolver um problema real do dia a dia, o projeto faz parte do meu portfólio de desenvolvimento de software, demonstrando boas práticas de arquitetura, organização de código e desenvolvimento de aplicações desktop com Python.
 
 ---
 
@@ -135,7 +199,7 @@ Além de resolver um problema real do dia a dia, o projeto serve como estudo de 
 
 ## Versão 1.1
 
-* [ ] Pesquisa
+* [ ] Pesquisa de notas
 * [ ] Categorias
 * [ ] Atalhos de teclado
 
@@ -153,9 +217,15 @@ Além de resolver um problema real do dia a dia, o projeto serve como estudo de 
 
 ---
 
-# 📸 Capturas de Tela
+# 🔮 Futuras Evoluções
 
-Em breve.
+* Sistema de temas
+* Modo escuro
+* Agrupamento de notas
+* Backup automático
+* Sincronização em nuvem
+* Integração com calendário
+* Notificações nativas do Windows
 
 ---
 
@@ -163,17 +233,10 @@ Em breve.
 
 Sugestões, melhorias e correções são bem-vindas.
 
+Caso encontre algum problema ou tenha uma ideia para o projeto, sinta-se à vontade para abrir uma issue.
+
 ---
 
 # 📄 Licença
 
 Este projeto está licenciado sob a licença MIT.
-
-
-# StickyDesk
-
-![Python](https://img.shields.io/badge/Python-3.11+-blue)
-![PySide6](https://img.shields.io/badge/PySide6-Qt-green)
-![License](https://img.shields.io/badge/license-MIT-orange)
-
-> Post-its digitais para sua área de trabalho.
