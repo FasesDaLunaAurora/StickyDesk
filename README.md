@@ -20,7 +20,7 @@ Em breve.
 
 <!-- Exemplo futuro -->
 
-<!-- ![StickyDesk Demo](docs/demo.gif) -->
+![Demo do StickyDesk](assets/demo.png)
 
 ---
 
