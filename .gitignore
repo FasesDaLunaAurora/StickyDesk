@@ -2,8 +2,18 @@
 .venv/
 venv/
 env/
+ENV/
 
 # Python
 __pycache__/
 *.py[cod]
+*.pyo
+*.pyd
 *$py.class
+
+# IDEs
+.vscode/
+.idea/
+
+# OS
+.DS_Store
