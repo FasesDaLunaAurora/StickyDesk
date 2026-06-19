@@ -9,9 +9,14 @@ from app.services.note_service import NoteService
 from app.storage.json_storage import JsonStorage
 from app.ui.main_window import MainWindow
 
-# Diretório onde este arquivo está, independente de onde o app é chamado
-_BASE_DIR = Path(__file__).resolve().parent
-_NOTES_PATH = _BASE_DIR / "data" / "notes.json"
+import os
+
+# Define o caminho na pasta AppData/Roaming do usuário do Windows
+_APPDATA_DIR = Path(os.environ["APPDATA"]) / "StickyDesk"
+_NOTES_PATH = _APPDATA_DIR / "notes.json"
+
+# Garante que a pasta StickyDesk exista antes de tentar criar o arquivo
+_APPDATA_DIR.mkdir(parents=True, exist_ok=True)
 
 
 def main() -> None:

@@ -1,0 +1,2 @@
+# Dependências de Desenvolvimento e Empacotamento
+pyinstaller>=6.0.0

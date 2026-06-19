@@ -156,104 +156,69 @@ main.py
 
 ---
 
-# 🚀 Executando o Projeto
+# 📦 Instalação (Para Usuários)
 
-### Clone o repositório
+A jornada de instalação do StickyDesk é simples e integrada ao padrão Windows. Não é necessário ter o Python instalado na máquina.
 
-```bash
-git clone https://github.com/seu-usuario/stickydesk.git
-```
+1. Baixe o instalador mais recente (`StickyDesk_Setup.exe`) na aba de [Releases](https://github.com).
+2. Execute o instalador e avance pelas telas do assistente.
+3. Marque a opção para criar um atalho na **Área de Trabalho**.
+4. Clique em **Concluir** para abrir o StickyDesk automaticamente.
 
-### Entre na pasta do projeto
-
-```bash
-cd stickydesk
-```
-
-### Crie o ambiente virtual
-
-```bash
-python -m venv .venv
-```
-
-### Ative o ambiente virtual
-
-```bash
-.\.venv\Scripts\Activate.ps1
-```
-
-### Instale/atualize as dependências
-
-```bash
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
-```
-
-### Execute a aplicação
-
-```bash
-python main.py
-```
-> Se o comando `python` não estiver funcionando, use o caminho completo do executável do Python que você instalou, por exemplo:
->
-> ```powershell
-> C:\Users\SeuUsuario\AppData\Local\Programs\Python\Python311\python.exe -m venv .venv
-> ```
->
-> E depois execute com:
->
-> ```powershell
-> .\.venv\Scripts\python.exe main.py
-> ```
+> 💡 **Onde ficam os meus dados?** Suas notas são salvas de forma segura e automática na pasta do seu usuário do Windows em `%APPDATA%\StickyDesk\notes.json`. Atualizar ou reinstalar o aplicativo não apagará seus lembretes.
 
 ---
 
-O ícone de post-it amarelo aparecerá na bandeja. Clique com o botão direito → Nova nota, ou dê duplo clique no ícone para criar rapidamente. <br>
+# 🛠️ Desenvolvimento (Para Programadores)
 
-### Criar o atalho na área de trabalho
+Se você deseja modificar o código-fonte, testar localmente ou gerar novas versões do executável, siga os passos abaixo.
 
-Depois de instalar as dependências (passo 3 acima), rode uma vez:
+### 1. Preparação do Ambiente
 
+Clone o repositório e entre na pasta do projeto:
+```bash
+git clone https://github.com/FasesDaLunaAurora/StickyDesk.git
+cd stickydesk
+```
+
+Crie o ambiente virtual e ative-o:
 ```powershell
-powershell -ExecutionPolicy Bypass -File criar_atalho.ps1
-```
-
-Isso cria **StickyDesk.lnk** na sua Área de Trabalho. A partir daí, basta dar **duplo clique** nele:
-
-- Se for a primeira vez, abre o app com nenhuma nota (ou as que você já tinha)
-- Se o app já tiver sido usado antes, todas as notas salvas (e marcadas como visíveis) abrem automaticamente
-
-> O atalho aponta para `StickyDesk.bat`, que usa `pythonw.exe` do ambiente virtual — por isso nenhuma janela de terminal preta aparece.
-
----
-
-## Execução em Dev
-
-1. Entre na pasta do projeto
-```
-cd stickydesk
-```
-2. Crie o ambiente virtual
-```
 python -m venv .venv
-```
-4. Ative o ambiente virtual
-```
 .\.venv\Scripts\Activate.ps1
 ```
-Se o PowerShell bloquear a ativação, rode esta linha uma vez:
-```
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
-```
-4. Instale/atualize as dependências
-```
+
+Instale as dependências da aplicação:
+```bash
 python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 ```
-5. Execute a aplicação
-```
+
+### 2. Executando em Modo de Desenvolvimento
+
+Para rodar a aplicação diretamente pelo código-fonte com o terminal ativo:
+```bash
 python main.py
 ```
+
+### 3. Gerando uma Nova Versão (Compilação)
+
+O projeto possui um script centralizador que ativa o ambiente virtual, garante as ferramentas necessárias e gera o executável autônomo.
+
+1. Certifique-se de que as dependências de empacotamento estão listadas em `requirements-dev.txt`.
+2. No terminal, execute o script de automação:
+   ```powershell
+   cmd /c .\build.bat
+   ```
+3. O executável standalone será gerado em: `dist/StickyDesk.exe`.
+
+### 4. Criando o Instalador Visual
+
+Para gerar o assistente de instalação final (`StickyDesk_Setup.exe`):
+1. Instale o [Inno Setup](https://jrsoftware.org) no seu Windows.
+2. Abra o Inno Setup Compiler.
+3. Carregue o arquivo `instalador.iss` localizado na raiz deste projeto.
+4. Clique em **Compile** (ícone de Play). O instalador será gerado na pasta `installer_output/`.
+
 
 ## Como usar
 
@@ -300,11 +265,15 @@ Além de resolver um problema real do dia a dia, o projeto faz parte do meu port
 
 ## Versão 1.1.0
 
-* [ ] Criar notas
-* [ ] Editar conteúdo
-* [ ] Arrastar pela tela
-* [ ] Persistência local
-* [ ] Personalização de cores
+* [x] Criar notas
+* [x] Editar conteúdo
+* [x] Arrastar pela tela
+* [x] Persistência local
+* [x] Personalização de cores
+* [x] Reabertura automática
+* [x] System Tray
+* [x] Títulos
+* [x] Fechar sem excluir
 
 ## Versão 1.2.0
 
