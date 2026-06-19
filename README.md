@@ -16,10 +16,6 @@ Projetado para ser leve, rápido e intuitivo, o StickyDesk ajuda a organizar lem
 
 # 📸 Demonstração
 
-Em breve.
-
-<!-- Exemplo futuro -->
-
 ![Demo do StickyDesk](assets/demo_v1.png)
 
 ---
