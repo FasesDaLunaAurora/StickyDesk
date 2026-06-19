@@ -17,3 +17,14 @@ __pycache__/
 
 # OS
 .DS_Store
+
+# PyInstaller & Compilação
+build/
+dist/
+*.spec
+
+# Pasta de saída do instalador (Inno Setup)
+installer_output/
+
+# Arquivo de banco de dados local 
+data/notes.json
