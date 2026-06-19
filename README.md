@@ -169,9 +169,9 @@ A jornada de instalação do StickyDesk é simples e integrada ao padrão Window
 
 ---
 
-# 🛠️ Desenvolvimento (Para Programadores)
+# 🛠️ Desenvolvimento e Lançamento (Para Programadores)
 
-Se você deseja modificar o código-fonte, testar localmente ou gerar novas versões do executável, siga os passos abaixo.
+Se você deseja modificar o código-fonte, testar localmente, gerar novas versões do executável ou publicar um lançamento oficial, siga os passos abaixo.
 
 ### 1. Preparação do Ambiente
 
@@ -218,6 +218,27 @@ Para gerar o assistente de instalação final (`StickyDesk_Setup.exe`):
 2. Abra o Inno Setup Compiler.
 3. Carregue o arquivo `instalador.iss` localizado na raiz deste projeto.
 4. Clique em **Compile** (ícone de Play). O instalador será gerado na pasta `installer_output/`.
+
+---
+
+### 🚀 5. Publicando uma Nova Release no GitHub
+
+Siga este processo padronizado para disponibilizar o instalador gerado na página oficial do repositório:
+
+1. **Consolide os commits:** Garanta que todas as alterações e a limpeza do `.gitignore` já estão mescladas e enviadas para a branch principal:
+   ```powershell
+   git checkout main
+   git pull origin main
+   ```
+2. **Acesse as Releases:** Na página do repositório no navegador, localize a seção **Releases** na coluna direita e clique em **Create a new release** (ou *Draft a new release*).
+3. **Configure a Tag e o Título:** 
+   - No campo **Choose a tag**, digite a nova versão (ex: `v1.1.0`) e clique em *Create new tag*. Garanta que o alvo (*Target*) seja a branch `main`.
+   - No campo **Release title**, nomeie o lançamento (ex: `StickyDesk v1.1.0 - Instalador e Persistência`).
+4. **Anexe o Instalador (Binário):**
+   - > ⚠️ **AVISO:** Nunca suba arquivos `.exe` diretamente via commits do Git. Eles devem ser anexados exclusivamente aqui.
+   - Role até a área pontilhada (*Attach binaries...*) e **arraste e solte** o arquivo `StickyDesk_Setup.exe` (que está na pasta `installer_output/`) lá dentro. Aguarde o carregamento concluir.
+5. **Publique:** Garanta que a opção **Set as the latest release** está marcada e clique no botão verde **Publish release**.
+
 
 
 ## Como usar
