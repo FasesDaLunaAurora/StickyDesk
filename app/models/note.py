@@ -11,8 +11,10 @@ class Note:
         id: Identificador único da nota.
         x: Posição horizontal na tela (pixels).
         y: Posição vertical na tela (pixels).
+        width: Largura atual da janela da nota (pixels).
+        height: Altura atual da janela da nota (pixels).
         color: Cor de fundo em formato hexadecimal (ex: '#fff176').
-        content: Texto da nota.
+        content: Texto da nota (markdown bruto).
         title: Título exibido no cabeçalho da nota.
         visible: Indica se a janela da nota deve ser exibida ao abrir o app.
     """
@@ -24,6 +26,8 @@ class Note:
     content: str = field(default="")
     title: str = field(default="")
     visible: bool = field(default=True)
+    width: int = field(default=250)
+    height: int = field(default=270)
 
     def to_dict(self) -> dict:
         """Serializa a nota para um dicionário compatível com JSON."""
@@ -35,6 +39,8 @@ class Note:
             "content": self.content,
             "title": self.title,
             "visible": self.visible,
+            "width": self.width,
+            "height": self.height,
         }
 
     @classmethod
@@ -48,4 +54,6 @@ class Note:
             content=data.get("content", ""),
             title=data.get("title", ""),
             visible=data.get("visible", True),
+            width=data.get("width", 250),
+            height=data.get("height", 270),
         )

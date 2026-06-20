@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 from PySide6.QtCore import QPoint, Qt
-from PySide6.QtGui import QColor, QFont, QPainter, QPainterPath, QPen
+from PySide6.QtGui import QColor, QFont, QPainter, QPainterPath, QPen, QPixmap
 from PySide6.QtWidgets import (
     QApplication,
     QHBoxLayout,
@@ -17,11 +19,17 @@ from PySide6.QtWidgets import (
 
 from app.models.note import Note
 from app.services.note_service import NoteService
+from app.services.settings_service import SettingsService
+from app.ui.settings_dialog import SettingsDialog
 from app.ui.sticky_note import StickyNoteWidget
 
-_PANEL_WIDTH = 220
+_PANEL_WIDTH = 240
 _PANEL_HEIGHT = 320
-_HEADER_HEIGHT = 34
+_HEADER_HEIGHT = 52
+_LOGO_SIZE = 36
+
+# Caminho esperado para a logo da aplicação (fornecida futuramente pelo usuário)
+_LOGO_PATH = Path(__file__).resolve().parent.parent.parent / "assets" / "logo.png"
 
 
 class MainWindow(QWidget):
@@ -29,17 +37,19 @@ class MainWindow(QWidget):
 
     Funciona como o "Bloco de Notas" tradicional: ao abrir o app, todas as
     notas salvas aparecem automaticamente (e uma nota em branco é criada se
-    não houver nenhuma). Este painel oferece uma visão geral e um ponto único
-    para encerrar a aplicação por completo.
+    não houver nenhuma). Este painel oferece uma visão geral, acesso às
+    configurações de aparência e um ponto único para encerrar a aplicação.
 
     Args:
         service: Serviço de domínio das notas.
+        settings: Serviço de configurações (paleta de cores personalizável).
         app: Instância da QApplication (necessária para encerrar o app).
     """
 
-    def __init__(self, service: NoteService, app: QApplication) -> None:
+    def __init__(self, service: NoteService, settings: SettingsService, app: QApplication) -> None:
         super().__init__()
         self._service = service
+        self._settings = settings
         self._app = app
         self._widgets: dict[int, StickyNoteWidget] = {}
 
@@ -66,7 +76,7 @@ class MainWindow(QWidget):
     def _build_ui(self) -> None:
         """Constrói o layout do painel: cabeçalho + lista de notas."""
         outer = QVBoxLayout(self)
-        outer.setContentsMargins(0, 0, 0, 0)
+        outer.setContentsMargins(6, 6, 6, 6)
         outer.setSpacing(0)
 
         self._container = QWidget(self)
@@ -88,7 +98,7 @@ class MainWindow(QWidget):
         self._apply_style()
 
     def _build_header(self) -> QWidget:
-        """Cria a barra superior do painel (drag handle + título + ações)."""
+        """Cria a barra superior do painel (drag handle + logo + ações)."""
         header = QWidget()
         header.setObjectName("panel_header")
         header.setFixedHeight(_HEADER_HEIGHT)
@@ -99,18 +109,23 @@ class MainWindow(QWidget):
         header.mouseReleaseEvent = self._header_mouse_release  # type: ignore[method-assign]
 
         layout = QHBoxLayout(header)
-        layout.setContentsMargins(10, 0, 6, 0)
-        layout.setSpacing(4)
+        layout.setContentsMargins(12, 0, 8, 0)
+        layout.setSpacing(6)
 
-        title = QLabel("StickyDesk")
-        title.setObjectName("panel_title")
-        title.setFont(QFont("Segoe UI", 9, QFont.Weight.DemiBold))
-        layout.addWidget(title)
+        layout.addWidget(self._build_logo())
         layout.addStretch()
+
+        settings_btn = QPushButton("⚙")
+        settings_btn.setObjectName("panel_btn_settings")
+        settings_btn.setFixedSize(22, 22)
+        settings_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        settings_btn.setToolTip("Configurações")
+        settings_btn.clicked.connect(self._open_settings)
+        layout.addWidget(settings_btn)
 
         min_btn = QPushButton("—")
         min_btn.setObjectName("panel_btn_min")
-        min_btn.setFixedSize(20, 20)
+        min_btn.setFixedSize(22, 22)
         min_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         min_btn.setToolTip("Minimizar todas as notas")
         min_btn.clicked.connect(self._minimize_all)
@@ -118,7 +133,7 @@ class MainWindow(QWidget):
 
         close_btn = QPushButton("✕")
         close_btn.setObjectName("panel_btn_close")
-        close_btn.setFixedSize(20, 20)
+        close_btn.setFixedSize(22, 22)
         close_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         close_btn.setToolTip("Fechar StickyDesk")
         close_btn.clicked.connect(self._quit)
@@ -126,22 +141,58 @@ class MainWindow(QWidget):
 
         return header
 
+    def _build_logo(self) -> QLabel:
+        """Cria o label da logo, usando a imagem fornecida ou um placeholder.
+
+        Se `assets/logo.png` existir, ela é exibida com altura fixa e
+        largura proporcional (adequado para logos no formato wordmark,
+        mais largas que altas). Caso contrário, mostra um placeholder
+        textual maior e legível até a logo definitiva ser fornecida.
+        """
+        logo_label = QLabel()
+        logo_label.setObjectName("panel_logo")
+
+        if _LOGO_PATH.exists():
+            pixmap = QPixmap(str(_LOGO_PATH))
+            scaled = pixmap.scaledToHeight(
+                _LOGO_SIZE, Qt.TransformationMode.SmoothTransformation
+            )
+            logo_label.setPixmap(scaled)
+            logo_label.setFixedHeight(_LOGO_SIZE)
+        else:
+            # Placeholder até a logo definitiva ser fornecida pelo usuário
+            logo_label.setText("📌 StickyDesk")
+            logo_label.setFont(QFont("Segoe UI", 13, QFont.Weight.Bold))
+
+        return logo_label
+
     def _apply_style(self) -> None:
         """Aplica o estilo visual do painel (tema neutro, discreto)."""
         self._container.setStyleSheet(
             """
             QWidget#panel_container {
-                background-color: #ededed;
-                border-radius: 10px;
+                background-color: #f3f3f3;
+                border-radius: 12px;
             }
             QWidget#panel_header {
-                background-color: #d8d8d8;
-                border-top-left-radius: 10px;
-                border-top-right-radius: 10px;
+                background-color: #e2e2e2;
+                border-top-left-radius: 12px;
+                border-top-right-radius: 12px;
             }
-            QLabel#panel_title {
+            QLabel#panel_logo {
                 color: rgba(0,0,0,0.65);
                 background: transparent;
+            }
+            QPushButton#panel_btn_settings {
+                background: transparent;
+                border: none;
+                color: rgba(0,0,0,0.45);
+                font-size: 14px;
+                border-radius: 6px;
+            }
+            QPushButton#panel_btn_settings:hover {
+                background: rgba(0,0,0,0.10);
+                color: rgba(0,0,0,0.80);
             }
             QPushButton#panel_btn_min {
                 background: transparent;
@@ -149,7 +200,7 @@ class MainWindow(QWidget):
                 color: rgba(0,0,0,0.40);
                 font-size: 13px;
                 font-weight: bold;
-                border-radius: 10px;
+                border-radius: 6px;
             }
             QPushButton#panel_btn_min:hover {
                 background: rgba(0,0,0,0.12);
@@ -161,7 +212,7 @@ class MainWindow(QWidget):
                 color: rgba(0,0,0,0.40);
                 font-size: 12px;
                 font-weight: bold;
-                border-radius: 10px;
+                border-radius: 6px;
             }
             QPushButton#panel_btn_close:hover {
                 background: rgba(200,0,0,0.18);
@@ -199,7 +250,7 @@ class MainWindow(QWidget):
         for i in range(6, 0, -1):
             path = QPainterPath()
             rect = self.rect().adjusted(i, i, -i, -i)
-            path.addRoundedRect(rect.x(), rect.y() + i, rect.width(), rect.height(), 10, 10)
+            path.addRoundedRect(rect.x(), rect.y() + i, rect.width(), rect.height(), 12, 12)
             painter.setPen(QPen(shadow_color, 0))
             painter.setBrush(shadow_color)
             painter.drawPath(path)
@@ -261,6 +312,8 @@ class MainWindow(QWidget):
             on_color_change=self._on_color_change,
             on_new_note=self._create_note,
             on_delete=self._on_delete,
+            on_size_change=self._on_size_change,
+            palette=self._settings.get_colors(),
         )
         self._widgets[note.id] = widget
         widget.show()
@@ -303,6 +356,9 @@ class MainWindow(QWidget):
     def _on_position_change(self, note_id: int, x: int, y: int) -> None:
         self._service.update_position(note_id, x, y)
 
+    def _on_size_change(self, note_id: int, width: int, height: int) -> None:
+        self._service.update_size(note_id, width, height)
+
     def _on_color_change(self, note_id: int, color: str) -> None:
         self._service.update_color(note_id, color)
 
@@ -311,6 +367,24 @@ class MainWindow(QWidget):
         self._service.delete(note_id)
         self._widgets.pop(note_id, None)
         self._refresh_list()
+
+    # ------------------------------------------------------------------
+    # Configurações
+    # ------------------------------------------------------------------
+
+    def _open_settings(self) -> None:
+        """Abre o diálogo de configurações de paleta de cores."""
+        dialog = SettingsDialog(
+            settings=self._settings,
+            on_palette_change=self._on_palette_change,
+            parent=self,
+        )
+        dialog.exec()
+
+    def _on_palette_change(self, colors: list[str]) -> None:
+        """Propaga a nova paleta para todas as notas já abertas."""
+        for widget in self._widgets.values():
+            widget.update_palette(colors)
 
     # ------------------------------------------------------------------
     # Ações globais do painel

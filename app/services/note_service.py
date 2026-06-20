@@ -1,16 +1,12 @@
 """Serviço de domínio: operações CRUD sobre notas."""
 
 from app.models.note import Note
+from app.services.settings_service import DEFAULT_COLORS, SettingsService
 from app.storage.json_storage import JsonStorage
 
-# Paleta de cores disponíveis para novas notas (ciclo automático)
-NOTE_COLORS: list[str] = [
-    "#fff176",  # amarelo suave
-    "#ffcc80",  # laranja suave
-    "#a5d6a7",  # verde suave
-    "#90caf9",  # azul suave
-    "#ce93d8",  # lilás suave
-]
+# Mantido por compatibilidade com código existente que importa NOTE_COLORS
+# diretamente (ex: paleta padrão antes da existência do SettingsService).
+NOTE_COLORS: list[str] = DEFAULT_COLORS
 
 
 class NoteService:
@@ -18,10 +14,14 @@ class NoteService:
 
     Args:
         storage: Instância da camada de persistência.
+        settings: Serviço de configurações, usado para obter a paleta de
+            cores atual ao criar novas notas. Se omitido, usa a paleta
+            padrão de fábrica.
     """
 
-    def __init__(self, storage: JsonStorage) -> None:
+    def __init__(self, storage: JsonStorage, settings: SettingsService | None = None) -> None:
         self._storage = storage
+        self._settings = settings
         self._notes: list[Note] = self._storage.load()
         self._color_index: int = 0
 
@@ -52,7 +52,8 @@ class NoteService:
             A nota recém-criada.
         """
         new_id = self._next_id()
-        color = NOTE_COLORS[self._color_index % len(NOTE_COLORS)]
+        palette = self._settings.get_colors() if self._settings else NOTE_COLORS
+        color = palette[self._color_index % len(palette)]
         self._color_index += 1
 
         note = Note(id=new_id, x=x, y=y, color=color, content="")
@@ -83,6 +84,13 @@ class NoteService:
         note = self._require(note_id)
         note.x = x
         note.y = y
+        self._persist()
+
+    def update_size(self, note_id: int, width: int, height: int) -> None:
+        """Atualiza as dimensões (largura/altura) de uma nota."""
+        note = self._require(note_id)
+        note.width = width
+        note.height = height
         self._persist()
 
     def update_color(self, note_id: int, color: str) -> None:
