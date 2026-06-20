@@ -1,5 +1,6 @@
 """Ponto de entrada da aplicação StickyDesk."""
 
+
 import sys
 from pathlib import Path
 
@@ -25,32 +26,14 @@ def main() -> None:
     app.setApplicationName("StickyDesk")
     app.setQuitOnLastWindowClosed(False)  # Mantém rodando sem janelas abertas
 
-    # Valida suporte a system tray
-    if not _check_systray(app):
-        sys.exit(1)
 
     # Composição das dependências (DI manual)
     storage = JsonStorage(filepath=str(_NOTES_PATH))
     service = NoteService(storage=storage)
-    _window = MainWindow(service=service, app=app)  # noqa: F841 — mantém referência viva
+    window = MainWindow(service=service, app=app)  # noqa: F841 — mantém referência viva
+    window.show()
 
     sys.exit(app.exec())
-
-
-def _check_systray(app: QApplication) -> bool:
-    """Verifica se o sistema suporta ícone na bandeja."""
-    from PySide6.QtWidgets import QSystemTrayIcon
-
-    if not QSystemTrayIcon.isSystemTrayAvailable():
-        QMessageBox.critical(
-            None,
-            "StickyDesk",
-            "Não foi possível detectar uma bandeja do sistema.\n"
-            "Verifique se seu ambiente de área de trabalho é compatível.",
-        )
-        return False
-    return True
-
 
 if __name__ == "__main__":
     main()

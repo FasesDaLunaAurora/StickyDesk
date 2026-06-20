@@ -37,7 +37,7 @@ class StickyNoteWidget(QWidget):
         on_title_change: Callback chamado com (note_id, novo_título).
         on_position_change: Callback chamado com (note_id, x, y).
         on_color_change: Callback chamado com (note_id, nova_cor).
-        on_close: Callback chamado com (note_id) ao apenas ocultar a nota.
+        on_new_note: Callback chamado (sem args) para criar uma nova nota.
         on_delete: Callback chamado com (note_id) ao excluir permanentemente.
     """
 
@@ -48,7 +48,7 @@ class StickyNoteWidget(QWidget):
         on_title_change: Callable[[int, str], None],
         on_position_change: Callable[[int, int, int], None],
         on_color_change: Callable[[int, str], None],
-        on_close: Callable[[int], None],
+        on_new_note: Callable[[], None],
         on_delete: Callable[[int], None],
     ) -> None:
         super().__init__()
@@ -58,7 +58,7 @@ class StickyNoteWidget(QWidget):
         self._on_title_change = on_title_change
         self._on_position_change = on_position_change
         self._on_color_change = on_color_change
-        self._on_close = on_close
+        self._on_new_note = on_new_note
         self._on_delete = on_delete
 
         # Drag state
@@ -85,11 +85,10 @@ class StickyNoteWidget(QWidget):
     # ------------------------------------------------------------------
 
     def _setup_window(self) -> None:
-        """Configura flags da janela: sem bordas, flutuante, translúcida."""
+        """Configura flags da janela: sem bordas, com suporte a minimizar."""
         self.setWindowFlags(
             Qt.WindowType.FramelessWindowHint
-            | Qt.WindowType.Tool
-            | Qt.WindowType.WindowStaysOnTopHint
+            | Qt.WindowType.Window
         )
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
         self.setMinimumSize(180, 160)
@@ -134,8 +133,6 @@ class StickyNoteWidget(QWidget):
         title_field.setPlaceholderText("Título")
         title_field.setFont(QFont("Segoe UI", 9, QFont.Weight.DemiBold))
         title_field.textChanged.connect(self._schedule_title_save)
-        # Evita que cliques no campo iniciem o drag da janela
-        title_field.mousePressEvent = lambda e: QLineEdit.mousePressEvent(title_field, e)  # type: ignore[method-assign]
         self._title_field = title_field
         layout.addWidget(title_field, stretch=1)
 
@@ -146,14 +143,23 @@ class StickyNoteWidget(QWidget):
 
         layout.addSpacing(6)
 
-        # Botão fechar (oculta, mantém salva)
-        close_btn = QPushButton("—")
-        close_btn.setObjectName("btn_close")
-        close_btn.setFixedSize(20, 20)
-        close_btn.setCursor(Qt.CursorShape.PointingHandCursor)
-        close_btn.setToolTip("Fechar (a nota continua salva)")
-        close_btn.clicked.connect(self._request_close)
-        layout.addWidget(close_btn)
+        # Botão nova nota
+        new_btn = QPushButton("+")
+        new_btn.setObjectName("btn_new")
+        new_btn.setFixedSize(20, 20)
+        new_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        new_btn.setToolTip("Criar nova nota")
+        new_btn.clicked.connect(lambda: self._on_new_note())
+        layout.addWidget(new_btn)
+
+        # Botão minimizar
+        min_btn = QPushButton("—")
+        min_btn.setObjectName("btn_min")
+        min_btn.setFixedSize(20, 20)
+        min_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        min_btn.setToolTip("Minimizar")
+        min_btn.clicked.connect(self.showMinimized)
+        layout.addWidget(min_btn)
 
         # Botão excluir permanentemente
         delete_btn = QPushButton("✕")
@@ -228,7 +234,19 @@ class StickyNoteWidget(QWidget):
                 background: rgba(255,255,255,0.35);
                 border-radius: 4px;
             }}
-            QPushButton#btn_close {{
+            QPushButton#btn_new {{
+                background: transparent;
+                border: none;
+                color: rgba(0,0,0,0.45);
+                font-size: 14px;
+                font-weight: bold;
+                border-radius: 10px;
+            }}
+            QPushButton#btn_new:hover {{
+                background: rgba(0,120,0,0.18);
+                color: rgba(0,90,0,0.95);
+            }}
+            QPushButton#btn_min {{
                 background: transparent;
                 border: none;
                 color: rgba(0,0,0,0.40);
@@ -236,7 +254,7 @@ class StickyNoteWidget(QWidget):
                 font-weight: bold;
                 border-radius: 10px;
             }}
-            QPushButton#btn_close:hover {{
+            QPushButton#btn_min:hover {{
                 background: rgba(0,0,0,0.12);
                 color: rgba(0,0,0,0.75);
             }}
@@ -336,11 +354,6 @@ class StickyNoteWidget(QWidget):
         self._apply_color(color)
         self._on_color_change(self._note_id, color)
 
-    def _request_close(self) -> None:
-        """Oculta a janela mas mantém a nota salva para reabrir depois."""
-        self._on_close(self._note_id)
-        self.hide()
-
     def _request_delete(self) -> None:
         """Pede confirmação e, se aceito, exclui a nota permanentemente."""
         resposta = QMessageBox.question(
@@ -353,6 +366,19 @@ class StickyNoteWidget(QWidget):
         if resposta == QMessageBox.StandardButton.Yes:
             self._on_delete(self._note_id)
             self.close()
+
+    def flush_pending_saves(self) -> None:
+        """Força a gravação imediata de conteúdo/título pendentes no debounce."""
+        if self._save_timer.isActive():
+            self._save_timer.stop()
+            self._flush_content()
+        if self._title_timer.isActive():
+            self._title_timer.stop()
+            self._flush_title()
+
+    def current_title(self) -> str:
+        """Retorna o título atual exibido no campo (para uso pelo painel)."""
+        return self._title_field.text()
 
     # ------------------------------------------------------------------
     # Utilitários

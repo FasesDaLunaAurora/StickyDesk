@@ -6,7 +6,7 @@
 ![License](https://img.shields.io/badge/License-MIT-orange)
 
 > Post-its digitais para sua área de trabalho.
-> **Versão atual: v1.1.0**
+> **Versão atual: v1.2.0**
 
 StickyDesk é uma aplicação desktop desenvolvida em Python e PySide6 que permite criar post-its digitais diretamente na área de trabalho do Windows.
 
@@ -43,14 +43,16 @@ Projetado para ser leve, rápido e intuitivo, o StickyDesk ajuda a organizar lem
 
 ---
 
-## Novidades da v1.1.0
+## Novidades da v1.2.0
 
-- 🖥️ **Atalho na área de trabalho** — duplo clique abre o app e reabre as notas salvas
-- 🟰 **Fechar ≠ Excluir** — fechar uma nota (botão `—`) apenas oculta a janela; a nota continua salva e reaparece da próxima vez que o app abrir ou ao clicar em *Mostrar todas as notas*
-- 🗑️ **Excluir permanentemente** — botão `✕` agora pede confirmação antes de apagar a nota para sempre
-- 📝 **Título no cabeçalho** — cada nota tem um campo de título editável, salvo junto com o conteúdo
-- 💾 **Persistência reforçada** — ao fechar o app pelo menu da bandeja, todo conteúdo e título pendentes são salvos antes de encerrar
-- 🔌 **Sobrevive a reinício do PC** — os dados ficam em `data/notes.json`, lidos com caminho absoluto (não depende mais de qual pasta você estava ao abrir o terminal)
+- 🚫 **Sem ícone na bandeja** — todo o controle do app agora passa pela janela painel e pelos botões de cada nota
+- 📋 **Painel de controle** — uma mini janela abre junto com as notas, listando os títulos de todas elas; clique em um item para restaurar/focar aquela nota
+- 📝 **Comportamento "Bloco de Notas"** — ao abrir o app, todas as notas salvas aparecem automaticamente; se não houver nenhuma, uma nota em branco é criada
+- ➕ **Nova nota direto da nota** — botão `+` no cabeçalho de cada nota, ao lado de minimizar e excluir
+- 🗕 **Minimizar de verdade** — o botão `—` de cada nota manda ela para a barra de tarefas (não fecha)
+- 🗑️ **Excluir continua exigindo confirmação** — botão `✕` apaga a nota permanentemente
+- 💾 **Persistência em AppData** — os dados ficam em `%APPDATA%\StickyDesk\notes.json`, compatível com instalação em `Program Files`
+- 📦 **Distribuição via instalador** — build com PyInstaller + instalador visual com Inno Setup
 
 # 🖥️ Tecnologias
 
