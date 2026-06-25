@@ -26,10 +26,53 @@ from app.ui.sticky_note import StickyNoteWidget
 _PANEL_WIDTH = 240
 _PANEL_HEIGHT = 320
 _HEADER_HEIGHT = 52
-_LOGO_SIZE = 36
+_LOGO_SIZE = 30
 
 # Caminho esperado para a logo da aplicação (fornecida futuramente pelo usuário)
 _LOGO_PATH = Path(__file__).resolve().parent.parent.parent / "assets" / "logo.png"
+
+
+class NoteIcon(QWidget):
+    """Ícone de post-it desenhado via QPainter, usado no placeholder de logo.
+
+    Evita depender de glyphs de emoji do sistema (que podem não renderizar
+    em todas as fontes/ambientes) e reaproveita a mesma linguagem visual
+    das notas reais: papel levemente erguido, dobra no canto inferior.
+    """
+
+    def paintEvent(self, event) -> None:  # noqa: N802
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+
+        rect = self.rect()
+        margin = 3
+        size = min(rect.width(), rect.height()) - margin * 2
+        x0, y0 = margin, margin
+        fold = size * 0.32
+
+        body = QPainterPath()
+        body.moveTo(x0, y0)
+        body.lineTo(x0 + size, y0)
+        body.lineTo(x0 + size, y0 + size - fold)
+        body.lineTo(x0 + size - fold, y0 + size)
+        body.lineTo(x0, y0 + size)
+        body.closeSubpath()
+
+        painter.setPen(QPen(QColor(0, 0, 0, 40), 1))
+        painter.setBrush(QColor("#ffe17a"))
+        painter.drawPath(body)
+
+        fold_path = QPainterPath()
+        fold_path.moveTo(x0 + size - fold, y0 + size)
+        fold_path.lineTo(x0 + size, y0 + size - fold)
+        fold_path.lineTo(x0 + size, y0 + size)
+        fold_path.closeSubpath()
+
+        painter.setPen(Qt.PenStyle.NoPen)
+        painter.setBrush(QColor("#e0bd4f"))
+        painter.drawPath(fold_path)
+
+        painter.end()
 
 
 class MainWindow(QWidget):
@@ -141,39 +184,51 @@ class MainWindow(QWidget):
 
         return header
 
-    def _build_logo(self) -> QLabel:
-        """Cria o label da logo, usando a imagem fornecida ou um placeholder.
+    def _build_logo(self) -> QWidget:
+        """Cria o elemento de logo, usando a imagem fornecida ou um placeholder.
 
         Se `assets/logo.png` existir, ela é exibida com altura fixa e
         largura proporcional (adequado para logos no formato wordmark,
-        mais largas que altas). Caso contrário, mostra um placeholder
-        textual maior e legível até a logo definitiva ser fornecida.
+        mais largas que altas). Caso contrário, mostra um ícone desenhado
+        programaticamente (sem depender de glyphs de emoji do sistema,
+        que podem não renderizar em todas as fontes) ao lado do nome.
         """
-        logo_label = QLabel()
-        logo_label.setObjectName("panel_logo")
-
         if _LOGO_PATH.exists():
+            logo_label = QLabel()
+            logo_label.setObjectName("panel_logo")
             pixmap = QPixmap(str(_LOGO_PATH))
             scaled = pixmap.scaledToHeight(
                 _LOGO_SIZE, Qt.TransformationMode.SmoothTransformation
             )
             logo_label.setPixmap(scaled)
             logo_label.setFixedHeight(_LOGO_SIZE)
-        else:
-            # Placeholder até a logo definitiva ser fornecida pelo usuário
-            logo_label.setText("📌 StickyDesk")
-            logo_label.setFont(QFont("Segoe UI", 13, QFont.Weight.Bold))
+            return logo_label
 
-        return logo_label
+        # Placeholder: ícone desenhado + nome, até a logo definitiva ser fornecida
+        wrapper = QWidget()
+        wrapper.setObjectName("panel_logo_placeholder")
+        row = QHBoxLayout(wrapper)
+        row.setContentsMargins(0, 0, 0, 0)
+        row.setSpacing(8)
+
+        icon = NoteIcon()
+        icon.setFixedSize(_LOGO_SIZE, _LOGO_SIZE)
+        row.addWidget(icon)
+
+        name_label = QLabel("StickyDesk")
+        name_label.setObjectName("panel_logo_text")
+        name_label.setFont(QFont("Segoe UI", 13, QFont.Weight.Bold))
+        row.addWidget(name_label)
+
+        return wrapper
 
     def _apply_style(self) -> None:
-        """Aplica o estilo visual do painel (tema neutro, discreto)."""
+        """Aplica o estilo visual do painel (tema unificado com o botão Restaurar)."""
         self._container.setStyleSheet(
             """
             QWidget#panel_container {
-                background-color: #fff4df; 
+                background-color: #fff4df;
                 border-radius: 12px;
-                border: 1px solid #f3e1ae;
             }
             QWidget#panel_header {
                 background-color: #f3e1ae;
@@ -182,79 +237,93 @@ class MainWindow(QWidget):
             }
             QLabel#panel_logo {
                 color: #a2835e;
-                font-weight: 600;
                 background: transparent;
             }
+            QLabel#panel_logo_text {
+                color: #a2835e;
+                background: transparent;
+                letter-spacing: 0.3px;
+            }
+            
+            /* =================================================================
+               BOTÕES DO CABEÇALHO: Alinhados ao arredondamento de 8px
+               ================================================================= */
             QPushButton#panel_btn_settings {
                 background: transparent;
                 border: none;
-                color: rgba(162,131,94,0.70);
+                color: #c69868;
                 font-size: 14px;
-                border-radius: 6px;
+                border-radius: 8px;          /* Ajustado de 6px para 8px */
             }
             QPushButton#panel_btn_settings:hover {
-                background: rgba(162,131,94,0.08);
+                background: #f1f1f1;
                 color: #a2835e;
             }
             QPushButton#panel_btn_min {
                 background: transparent;
                 border: none;
-                color: rgba(162,131,94,0.70);
+                color: #c69868;
                 font-size: 13px;
                 font-weight: bold;
-                border-radius: 6px;
+                border-radius: 8px;          /* Ajustado de 6px para 8px */
             }
             QPushButton#panel_btn_min:hover {
-                background: rgba(162,131,94,0.08);
+                background: #f1f1f1;
                 color: #a2835e;
             }
             QPushButton#panel_btn_close {
                 background: transparent;
                 border: none;
-                color: rgba(162,131,94,0.70);
+                color: #c69868;
                 font-size: 12px;
                 font-weight: bold;
-                border-radius: 6px;
+                border-radius: 8px;          /* Ajustado de 6px para 8px */
             }
             QPushButton#panel_btn_close:hover {
-                background: rgba(184,65,56,0.12);
-                color: #b84138;
+                background: #f1f1f1;
+                color: #a2835e;
             }
+            
+            /* =================================================================
+               LISTA DE NOTAS ADESIVAS: Estrutura idêntica ao botão Restaurar
+               ================================================================= */
             QListWidget#notes_list {
                 background: transparent;
                 border: none;
                 padding: 4px 8px;
-                font-family: "Segoe UI", "Helvetica Neue", sans-serif;
+                font-family: "Segoe UI";
                 font-size: 12px;
-                color: #a2835e;
-            }
-            
-            /* 1. PADRÃO: Fundo cinza-claro, contorno e texto em marrom médio */
-            QListWidget#notes_list::item {
-                padding: 7px 10px;
-                border-radius: 16px; /* Bordas mais arredondadas como a imagem */
-                margin-bottom: 5px;
-                background-color: #fff4df; 
-                border: 1px solid #c69868;
                 color: #c69868;
             }
             
-            /* 2. HOVER: Inverte. Preenchimento marrom médio, texto e borda claros */
-            QListWidget#notes_list::item:hover {
-                background-color: #c69868;
-                border: 1px solid #c69868;
-                color: #fff4df;
+            /* 1. PADRÃO (Parado): Bloco bege claro e texto em marrom médio */
+            QListWidget#notes_list::item {
+                padding: 8px 12px;           
+                border-radius: 8px;          
+                margin-bottom: 4px;          
+                background-color: #f3e1ae;   /* Bege oficial */
+                border: none;                
+                color: #c69868;              /* Marrom médio */
             }
             
-            /* 3. SELECIONADO: Mantém o preenchimento marrom, mas com a borda clara */
-            QListWidget#notes_list::item:selected {
-                background-color: #c69868;
-                border: 1px solid #fff4df;
-                color: #fff4df;
-                font-weight: 500;
+            /* 2. HOVER: Transiciona suavemente para o bege mais escuro (marrom médio) */
+            QListWidget#notes_list::item:hover {
+                background-color: #c69868;   /* Bege mais escuro / Marrom médio */
+                border: none;
+                color: #fff4df;              /* Texto claro para contraste */
             }
+            
+            /* 3. SELECIONADO: Mantém o bege mais escuro e adiciona a borda creme clara */
+            QListWidget#notes_list::item:selected {
+                background-color: #c69868;   /* Bege mais escuro / Marrom médio */
+                border: 1px solid #fff4df;   /* Borda fina em creme */
+                color: #fff4df;              
+            }
+
+
             """
         )
+
 
     def paintEvent(self, event) -> None:  # noqa: N802
         """Desenha sombra suave ao redor do painel."""

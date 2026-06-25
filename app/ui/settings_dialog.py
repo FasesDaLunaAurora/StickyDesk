@@ -42,7 +42,7 @@ class SettingsDialog(FramelessPanel):
         parent: QWidget | None = None,
     ) -> None:
         super().__init__(
-            title="Configurações",
+            title="Configurações — StickyDesk",
             on_close=self._handle_close,
             parent=parent,
         )
@@ -51,7 +51,7 @@ class SettingsDialog(FramelessPanel):
         self._swatches: list[QPushButton] = []
 
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.Dialog)
-        self.setFixedSize(360, 280)
+        self.setFixedSize(370, 300)
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
 
         self._build_content()
@@ -64,9 +64,8 @@ class SettingsDialog(FramelessPanel):
     def _build_content(self) -> None:
         """Constrói o conteúdo específico do diálogo dentro do painel base."""
         heading = QLabel("Paleta de cores")
-        heading.setFont(QFont("Segoe UI", 11, QFont.Weight.DemiBold))
-        # Cor do título principal em marrom escuro característico do app
-        heading.setStyleSheet("color: #a2835e; font-weight: 600;")
+        heading.setFont(QFont("Segoe UI", 12, QFont.Weight.DemiBold))
+        heading.setStyleSheet("color: #a2835e; letter-spacing: 0.2px;")
         self.content_layout.addWidget(heading)
 
         subtitle = QLabel(
@@ -74,12 +73,13 @@ class SettingsDialog(FramelessPanel):
             "disponíveis nas notas."
         )
         subtitle.setFont(QFont("Segoe UI", 9))
-        # Subtítulo em marrom médio para consistência com o painel de notas
-        subtitle.setStyleSheet("color: #c69868;")
+        subtitle.setStyleSheet("color: #c69868; line-height: 140%;")
         self.content_layout.addWidget(subtitle)
 
+        self.content_layout.addSpacing(4)
+
         swatch_row = QHBoxLayout()
-        swatch_row.setSpacing(12)
+        swatch_row.setSpacing(14)
         for index in range(PALETTE_SIZE):
             swatch_row.addWidget(self._build_swatch(index))
         self.content_layout.addLayout(swatch_row)
@@ -91,30 +91,28 @@ class SettingsDialog(FramelessPanel):
         restore_btn.setStyleSheet(
             """
             QPushButton {
-                /* Botão secundário: fundo cinza-claro, contorno e texto em marrom médio */
-                background-color: #f1f1f1;
-                color: #c69868;
-                border: 1px solid #c69868;
-                border-radius: 14px; /* Formato pílula idêntico às notas */
-                padding: 7px 12px;
-                font-family: "Segoe UI", "Helvetica Neue", sans-serif;
-                font-size: 10pt;
+                background: #c69868;
+                color: #fff4df;
+                border: none;
+                border-radius: 8px;
+                padding: 8px 12px;
+                font-family: "Segoe UI";
+                font-size: 9.5pt;
             }
             QPushButton:hover {
-                /* Efeito hover inverte as cores exatamente como os itens da lista */
-                background-color: #c69868;
-                border-color: #c69868;
-                color: #fff4df; /* Texto ganha o tom creme claro */
+                background: #a2835e;
             }
             """
         )
+
         restore_btn.clicked.connect(self._restore_defaults)
         self.content_layout.addWidget(restore_btn)
+
 
     def _build_swatch(self, index: int) -> QPushButton:
         """Cria um botão circular que representa um slot de cor editável."""
         btn = QPushButton()
-        btn.setFixedSize(44, 44)
+        btn.setFixedSize(46, 46)
         btn.setCursor(Qt.CursorShape.PointingHandCursor)
         btn.setToolTip("Clique para escolher uma cor")
         btn.clicked.connect(lambda _checked, i=index: self._pick_color(i))
@@ -149,13 +147,11 @@ class SettingsDialog(FramelessPanel):
                 f"""
                 QPushButton {{
                     background-color: {color};
-                    border-radius: 22px; /* Metade de 44 para garantir círculo perfeito */
-                    /* Substituído o preto genérico por borda fina no tom pastel dourado */
-                    border: 2px solid #f3e1ae; 
+                    border-radius: 23px;
+                    border: 1.5px solid rgba(0,0,0,0.10);
                 }}
                 QPushButton:hover {{
-                    /* Ao passar o mouse, a borda do círculo se destaca no marrom médio */
-                    border: 2px solid #c69868;
+                    border: 1.5px solid rgba(0,0,0,0.35);
                 }}
                 """
             )

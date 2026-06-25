@@ -95,47 +95,34 @@ class FramelessPanel(QWidget):
         """Aplica o mesmo estilo visual usado no painel principal (MainWindow)."""
         self._container.setStyleSheet(
             f"""
-            /* =================================================================
-               CONTAINER GERAL DA JANELA
-               ================================================================= */
             QWidget#frameless_container {{
-                background-color: #fff4df;   /* Tom creme claro e limpo para o fundo */
+                background-color: #fff4df;
                 border-radius: {_CORNER_RADIUS}px;
-                border: 1px solid #f3e1ae;   /* Borda fina externa em ouro-pastel */
             }}
-            
-            /* =================================================================
-               CABEÇALHO / BARRA DE TÍTULO
-               ================================================================= */
             QWidget#frameless_header {{
-                background-color: #f3e1ae;   /* Cabeçalho combinando com o ouro-pastel */
+                background-color: #f3e1ae;
                 border-top-left-radius: {_CORNER_RADIUS}px;
                 border-top-right-radius: {_CORNER_RADIUS}px;
             }}
             QLabel#frameless_header_title {{
-                color: #a2835e;              /* Texto do título em marrom escuro sofisticado */
-                font-weight: 600;            /* Deixa o título elegantemente encorpado */
+                color: #a2835e;
                 background: transparent;
             }}
-            
-            /* =================================================================
-               BOTÃO DE FECHAR (✕)
-               ================================================================= */
             QPushButton#frameless_header_close {{
-                background: transparent;     /* Sem fundo inicial */
+                background: transparent;
                 border: none;
-                color: rgba(162,131,94,0.65);/* Marrom escuro com opacidade para suavidade */
+                color: #c69868;
                 font-size: 12px;
                 font-weight: bold;
                 border-radius: 6px;
             }}
             QPushButton#frameless_header_close:hover {{
-                /* Vermelho/Terracota baseado na paleta fina para a ação de fechar */
-                background: rgba(184,65,56,0.12);
-                color: #b84138;
+                background: #f1f1f1;
+                color: #a2835e;
             }}
             """
         )
+
 
     # ------------------------------------------------------------------
     # Sombra (idêntica à do MainWindow)
@@ -176,3 +163,4 @@ class FramelessPanel(QWidget):
     def _header_mouse_release(self, event) -> None:
         if event.button() == Qt.MouseButton.LeftButton:
             self._drag_active = False
+

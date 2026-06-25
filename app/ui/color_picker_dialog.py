@@ -56,7 +56,88 @@ class ColorPickerDialog(FramelessPanel):
         picker.setWindowFlags(Qt.WindowType.Widget)
         picker.colorSelected.connect(self._handle_accept)
         picker.rejected.connect(self._handle_cancel)
+        self._apply_picker_style(picker)
         return picker
+
+    def _apply_picker_style(self, picker: QColorDialog) -> None:
+        """Sobrescreve o visual nativo do Windows para combinar com o app.
+
+        O QColorDialog herda o tema do sistema operacional por padrão
+        (incluindo tints de cor do Windows), então cada componente interno
+        precisa de uma regra explícita para não destoar do restante do app.
+        """
+        picker.setStyleSheet(
+        """
+        QColorDialog {
+            /* Fundo creme claro e limpo oficial */
+            background-color: #fff4df;
+        }
+        QColorDialog QLabel {
+            /* Textos e legendas em marrom escuro sofisticado */
+            color: #a2835e;
+            font-family: "Segoe UI";
+            font-size: 9.5pt;
+            background: transparent;
+        }
+        QColorDialog QGroupBox {
+            background: transparent;
+            border: none;
+            margin-top: 6px;
+            font-family: "Segoe UI";
+            font-size: 9.5pt;
+            /* Cabeçalhos de grupos de cores em marrom escuro */
+            color: #a2835e;
+        }
+        QColorDialog QAbstractSpinBox {
+            /* Campos numéricos com fundo cinza-claro das notas */
+            background: #f1f1f1;
+            /* Borda sutil em ouro-pastel */
+            border: 1px solid #f3e1ae;
+            border-radius: 6px;
+            padding: 3px 6px;
+            /* Digitação em marrom médio para alta legibilidade */
+            color: #c69868;
+            font-family: "Segoe UI";
+        }
+        QColorDialog QAbstractSpinBox:focus {
+            /* Campo focado ganha contorno em marrom médio */
+            border: 1px solid #c69868;
+        }
+        QColorDialog QLineEdit {
+            /* Campo de texto (como o código HEX) com fundo cinza-claro */
+            background: #f1f1f1;
+            /* Borda em ouro-pastel */
+            border: 1px solid #f3e1ae;
+            border-radius: 6px;
+            padding: 4px 8px;
+            /* Texto em marrom médio */
+            color: #c69868;
+            font-family: "Segoe UI";
+        }
+        QColorDialog QLineEdit:focus {
+            /* Campo de texto focado ganha contorno em marrom médio */
+            border: 1px solid #c69868;
+        }
+        
+        /* =================================================================
+        BOTÕES DO DIÁLOGO: Alinhados exatamente ao padrão do "Restaurar"
+        ================================================================= */
+        QColorDialog QPushButton {
+            background: #c69868;
+            color: #fff4df;
+            border: none;
+            border-radius: 8px;          /* Ajustado de 6px para 8px */
+            padding: 8px 12px;           /* Ajustado de 7px 16px para 8px 12px */
+            font-family: "Segoe UI";
+            font-size: 9.5pt;
+        }
+        QColorDialog QPushButton:hover {
+            background: #a2835e;
+        }
+        """
+    )
+
+
 
     # ------------------------------------------------------------------
     # Resultado
