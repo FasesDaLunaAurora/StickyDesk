@@ -145,112 +145,101 @@ class MainWindow(QWidget):
         """Cria o label da logo, usando a imagem fornecida ou um placeholder.
 
         Se `assets/logo.png` existir, ela é exibida com altura fixa e
-        largura proporcional. Caso contrário, mostra um placeholder
+        largura proporcional (adequado para logos no formato wordmark,
+        mais largas que altas). Caso contrário, mostra um placeholder
         textual maior e legível até a logo definitiva ser fornecida.
         """
         logo_label = QLabel()
         logo_label.setObjectName("panel_logo")
 
-        pixmap = QPixmap(str(_LOGO_PATH))
-        scaled = pixmap.scaledToHeight(
-            _LOGO_SIZE, Qt.TransformationMode.SmoothTransformation
-        )
-        logo_label.setPixmap(scaled)
-        logo_label.setFixedHeight(_LOGO_SIZE)
+        if _LOGO_PATH.exists():
+            pixmap = QPixmap(str(_LOGO_PATH))
+            scaled = pixmap.scaledToHeight(
+                _LOGO_SIZE, Qt.TransformationMode.SmoothTransformation
+            )
+            logo_label.setPixmap(scaled)
+            logo_label.setFixedHeight(_LOGO_SIZE)
+        else:
+            # Placeholder até a logo definitiva ser fornecida pelo usuário
+            logo_label.setText("📌 StickyDesk")
+            logo_label.setFont(QFont("Segoe UI", 13, QFont.Weight.Bold))
 
         return logo_label
 
     def _apply_style(self) -> None:
-        """Aplica o estilo visual do painel (Design Fino baseado no botão)."""
+        """Aplica o estilo visual do painel (tema neutro, discreto)."""
         self._container.setStyleSheet(
             """
             QWidget#panel_container {
-                background-color: #fff4df; 
+                background-color: #f3f3f3;
                 border-radius: 12px;
-                border: 1px solid #f3e1ae;
             }
             QWidget#panel_header {
-                background-color: #f3e1ae;
+                background-color: #e2e2e2;
                 border-top-left-radius: 12px;
                 border-top-right-radius: 12px;
             }
             QLabel#panel_logo {
-                color: #a2835e;
-                font-weight: 600;
+                color: rgba(0,0,0,0.65);
                 background: transparent;
             }
             QPushButton#panel_btn_settings {
                 background: transparent;
                 border: none;
-                color: rgba(162,131,94,0.70);
+                color: rgba(0,0,0,0.45);
                 font-size: 14px;
                 border-radius: 6px;
             }
             QPushButton#panel_btn_settings:hover {
-                background: rgba(162,131,94,0.08);
-                color: #a2835e;
+                background: rgba(0,0,0,0.10);
+                color: rgba(0,0,0,0.80);
             }
             QPushButton#panel_btn_min {
                 background: transparent;
                 border: none;
-                color: rgba(162,131,94,0.70);
+                color: rgba(0,0,0,0.40);
                 font-size: 13px;
                 font-weight: bold;
                 border-radius: 6px;
             }
             QPushButton#panel_btn_min:hover {
-                background: rgba(162,131,94,0.08);
-                color: #a2835e;
+                background: rgba(0,0,0,0.12);
+                color: rgba(0,0,0,0.75);
             }
             QPushButton#panel_btn_close {
                 background: transparent;
                 border: none;
-                color: rgba(162,131,94,0.70);
+                color: rgba(0,0,0,0.40);
                 font-size: 12px;
                 font-weight: bold;
                 border-radius: 6px;
             }
             QPushButton#panel_btn_close:hover {
-                background: rgba(184,65,56,0.12);
-                color: #b84138;
+                background: rgba(200,0,0,0.18);
+                color: rgba(150,0,0,0.95);
             }
             QListWidget#notes_list {
                 background: transparent;
                 border: none;
                 padding: 4px 8px;
-                font-family: "Segoe UI", "Helvetica Neue", sans-serif;
+                font-family: "Segoe UI";
                 font-size: 12px;
-                color: #a2835e;
+                color: #333;
             }
-            
-            /* 1. PADRÃO: Fundo cinza-claro, contorno e texto em marrom médio */
             QListWidget#notes_list::item {
-                padding: 7px 10px;
-                border-radius: 16px; /* Bordas mais arredondadas como a imagem */
-                margin-bottom: 5px;
-                background-color: #fff4df; 
-                border: 1px solid #c69868;
-                color: #c69868;
+                padding: 6px 8px;
+                border-radius: 6px;
+                margin-bottom: 2px;
             }
-            
-            /* 2. HOVER: Inverte. Preenchimento marrom médio, texto e borda claros */
             QListWidget#notes_list::item:hover {
-                background-color: #c69868;
-                border: 1px solid #c69868;
-                color: #fff4df;
+                background: rgba(0,0,0,0.06);
             }
-            
-            /* 3. SELECIONADO: Mantém o preenchimento marrom, mas com a borda clara */
             QListWidget#notes_list::item:selected {
-                background-color: #c69868;
-                border: 1px solid #fff4df;
-                color: #fff4df;
-                font-weight: 500;
+                background: rgba(0,0,0,0.10);
+                color: #333;
             }
             """
         )
-
-
 
     def paintEvent(self, event) -> None:  # noqa: N802
         """Desenha sombra suave ao redor do painel."""
