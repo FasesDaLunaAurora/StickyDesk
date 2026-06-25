@@ -96,25 +96,31 @@ stickydesk/
 │
 ├── app/
 │   ├── models/
-│   │   └── note.py           # Dataclass Note — domínio puro (id, x, y, color, content, title, visible)
+│   │   └── note.py              # Dataclass Note — domínio puro (+ width/height)
 │   │
 │   ├── services/
-│   │   └── note_service.py   # CRUD, geração de ID, paleta de cores, visibilidade
+│   │   ├── note_service.py      # CRUD, geração de ID, cor inicial via paleta
+│   │   └── settings_service.py  # Paleta de 5 cores personalizável + restaurar padrão
 │   │
 │   ├── storage/
-│   │   └── json_storage.py   # Leitura/escrita no arquivo JSON
+│   │   └── json_storage.py      # Leitura/escrita no arquivo JSON
 │   │
 │   └── ui/
-│       ├── main_window.py    # Systray + coordenação dos widgets
-│       └── sticky_note.py    # Widget visual de cada nota (título, fechar, excluir)
+│       ├── main_window.py       # Painel: logo, engrenagem, lista de notas, minimizar/fechar tudo
+│       ├── settings_dialog.py   # Diálogo de configurações de paleta
+│       ├── live_markdown_editor.py  # QTextEdit com markdown→rich text em tempo real
+│       └── sticky_note.py       # Widget visual da nota (dobra, resize, botões)
 │
-├── data/
-│   └── notes.json            # Persistência local (criado automaticamente)
+├── assets/
+│   ├── icon.ico                 # Ícone do executável (adicionar manualmente)
+│   └── logo.png                 # Logo do painel principal (adicionar manualmente)
 │
-├── main.py                   # Ponto de entrada + DI manual + caminho absoluto do JSON
-├── StickyDesk.bat            # Launcher sem console, usado pelo atalho
-├── criar_atalho.ps1          # Script que gera o atalho na Área de Trabalho
-└── requirements.txt
+├── main.py                      # Ponto de entrada + DI manual + caminho AppData
+├── build.bat                    # Pipeline local: venv + deps + PyInstaller
+├── instalador.iss               # Script do Inno Setup
+├── requirements.txt             # Dependências de produção (PySide6)
+├── requirements-dev.txt         # Dependências de build (PyInstaller)
+└── .gitignore
 ```
 ### Fluxo de dados
 

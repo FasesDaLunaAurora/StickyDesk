@@ -42,7 +42,7 @@ class SettingsDialog(FramelessPanel):
         parent: QWidget | None = None,
     ) -> None:
         super().__init__(
-            title="Configurações — StickyDesk",
+            title="Configurações",
             on_close=self._handle_close,
             parent=parent,
         )
@@ -65,7 +65,8 @@ class SettingsDialog(FramelessPanel):
         """Constrói o conteúdo específico do diálogo dentro do painel base."""
         heading = QLabel("Paleta de cores")
         heading.setFont(QFont("Segoe UI", 11, QFont.Weight.DemiBold))
-        heading.setStyleSheet("color: #2d2d2d;")
+        # Cor do título principal em marrom escuro característico do app
+        heading.setStyleSheet("color: #a2835e; font-weight: 600;")
         self.content_layout.addWidget(heading)
 
         subtitle = QLabel(
@@ -73,7 +74,8 @@ class SettingsDialog(FramelessPanel):
             "disponíveis nas notas."
         )
         subtitle.setFont(QFont("Segoe UI", 9))
-        subtitle.setStyleSheet("color: #777;")
+        # Subtítulo em marrom médio para consistência com o painel de notas
+        subtitle.setStyleSheet("color: #c69868;")
         self.content_layout.addWidget(subtitle)
 
         swatch_row = QHBoxLayout()
@@ -89,43 +91,25 @@ class SettingsDialog(FramelessPanel):
         restore_btn.setStyleSheet(
             """
             QPushButton {
-                background: transparent;
-                color: #555;
-                border: 1px solid #ccc;
-                border-radius: 6px;
+                /* Botão secundário: fundo cinza-claro, contorno e texto em marrom médio */
+                background-color: #f1f1f1;
+                color: #c69868;
+                border: 1px solid #c69868;
+                border-radius: 14px; /* Formato pílula idêntico às notas */
                 padding: 7px 12px;
-                font-family: "Segoe UI";
+                font-family: "Segoe UI", "Helvetica Neue", sans-serif;
                 font-size: 10pt;
             }
             QPushButton:hover {
-                background: #eee;
-                border-color: #999;
+                /* Efeito hover inverte as cores exatamente como os itens da lista */
+                background-color: #c69868;
+                border-color: #c69868;
+                color: #fff4df; /* Texto ganha o tom creme claro */
             }
             """
         )
         restore_btn.clicked.connect(self._restore_defaults)
         self.content_layout.addWidget(restore_btn)
-
-        close_btn = QPushButton("Fechar")
-        close_btn.setCursor(Qt.CursorShape.PointingHandCursor)
-        close_btn.setStyleSheet(
-            """
-            QPushButton {
-                background: #2d2d2d;
-                color: white;
-                border: none;
-                border-radius: 6px;
-                padding: 7px 12px;
-                font-family: "Segoe UI";
-                font-size: 10pt;
-            }
-            QPushButton:hover {
-                background: #444;
-            }
-            """
-        )
-        close_btn.clicked.connect(self._handle_close)
-        self.content_layout.addWidget(close_btn)
 
     def _build_swatch(self, index: int) -> QPushButton:
         """Cria um botão circular que representa um slot de cor editável."""
@@ -165,11 +149,13 @@ class SettingsDialog(FramelessPanel):
                 f"""
                 QPushButton {{
                     background-color: {color};
-                    border-radius: 22px;
-                    border: 2px solid rgba(0,0,0,0.15);
+                    border-radius: 22px; /* Metade de 44 para garantir círculo perfeito */
+                    /* Substituído o preto genérico por borda fina no tom pastel dourado */
+                    border: 2px solid #f3e1ae; 
                 }}
                 QPushButton:hover {{
-                    border: 2px solid rgba(0,0,0,0.45);
+                    /* Ao passar o mouse, a borda do círculo se destaca no marrom médio */
+                    border: 2px solid #c69868;
                 }}
                 """
             )
