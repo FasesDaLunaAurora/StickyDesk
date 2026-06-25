@@ -1,7 +1,7 @@
 """Conversor leve de markdown básico para HTML, sem dependências externas.
 
-Suporta apenas o subconjunto necessário para as notas do StickyDesk:
-negrito, itálico, listas com marcador e caixas de seleção (checkbox).
+Suporta apenas o subconjunto necessário para as notas:
+negrito, itálico, listas com marcador e checkbox.
 """
 
 import re
@@ -22,7 +22,7 @@ def markdown_to_html(text: str) -> str:
         text: Texto em markdown bruto, como digitado pelo usuário.
 
     Returns:
-        HTML equivalente, seguro para uso em QTextEdit.setHtml().
+        HTML equivalente, para uso em QTextEdit.setHtml().
     """
     if not text:
         return ""

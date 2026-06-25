@@ -5,15 +5,15 @@ from dataclasses import dataclass, field
 
 @dataclass
 class Note:
-    """Representa uma nota adesiva com posição, cor e conteúdo.
+    """Representa uma nota adesiva.
 
     Attributes:
         id: Identificador único da nota.
-        x: Posição horizontal na tela (pixels).
-        y: Posição vertical na tela (pixels).
-        width: Largura atual da janela da nota (pixels).
-        height: Altura atual da janela da nota (pixels).
-        color: Cor de fundo em formato hexadecimal (ex: '#fff176').
+        x: Posição horizontal na tela.
+        y: Posição vertical na tela.
+        width: Largura atual da janela da nota.
+        height: Altura atual da janela da nota.
+        color: Cor de fundo em formato hexadecimal.
         content: Texto da nota (markdown bruto).
         title: Título exibido no cabeçalho da nota.
         visible: Indica se a janela da nota deve ser exibida ao abrir o app.

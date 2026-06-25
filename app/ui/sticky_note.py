@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Callable
 
-from PySide6.QtCore import QEvent, QPoint, QRect, QTimer, Qt
+from PySide6.QtCore import QPoint, QRect, QTimer, Qt
 from PySide6.QtGui import (
     QColor,
     QFont,
@@ -20,15 +20,14 @@ from PySide6.QtWidgets import (
     QMenu,
     QMessageBox,
     QPushButton,
-    QTextEdit,
     QVBoxLayout,
     QWidget,
     QWidgetAction,
 )
 
 from app.models.note import Note
-from app.services.markdown_renderer import markdown_to_html
 from app.services.note_service import NOTE_COLORS
+from app.ui.live_markdown_editor import LiveMarkdownEditor
 
 # Debounce para auto-save de conteúdo (ms)
 _AUTOSAVE_DELAY_MS = 500
@@ -171,7 +170,6 @@ class StickyNoteWidget(QWidget):
         self._title_timer.timeout.connect(self._flush_title)
 
         self._raw_content = note.content
-        self._is_editing_text = True
 
         self._setup_window()
         self._build_ui(note)
@@ -326,53 +324,35 @@ class StickyNoteWidget(QWidget):
         btn.clicked.connect(lambda _checked, c=color: self._change_color(c))
         return btn
 
-    def _build_editor(self, content: str) -> QTextEdit:
-        """Cria a área de edição/exibição de texto com suporte a markdown.
+    def _build_editor(self, content: str) -> LiveMarkdownEditor:
+        """Cria a área de edição com formatação markdown aplicada ao vivo.
 
-        Ao ganhar foco, mostra o texto bruto (markdown) para edição.
-        Ao perder o foco, renderiza negrito, listas e caixas de seleção.
+        O conteúdo é carregado como HTML (rich text), já que não existe
+        mais markdown bruto separado — a formatação é parte do documento.
+
+        Notas salvas por versões anteriores (markdown bruto em texto puro)
+        são carregadas como texto simples, sem perder o conteúdo — apenas
+        sem a formatação retroativa, que passa a se aplicar a partir da
+        próxima edição.
         """
-        editor = QTextEdit()
+        editor = LiveMarkdownEditor()
         editor.setObjectName("editor")
         editor.setFont(QFont("Segoe UI", 10))
-        editor.setPlaceholderText("Escreva sua nota aqui… (markdown: **negrito**, - item, [ ] tarefa)")
-        editor.setPlainText(content)
+        editor.setPlaceholderText("Escreva sua nota aqui… (**negrito**, *itálico*, - item, [ ] tarefa)")
+
+        if "<html" in content.lower() or "<!doctype" in content.lower():
+            editor.setHtml(content)
+        else:
+            editor.setPlainText(content)
+
         editor.textChanged.connect(self._on_text_changed)
-        editor.installEventFilter(self)
         self._editor = editor
         return editor
 
-    def eventFilter(self, watched, event) -> bool:  # noqa: N802
-        """Alterna entre modo de edição (raw) e modo de exibição (renderizado)."""
-        if watched is self._editor:
-            if event.type() == QEvent.Type.FocusIn:
-                self._enter_edit_mode()
-            elif event.type() == QEvent.Type.FocusOut:
-                self._enter_preview_mode()
-        return super().eventFilter(watched, event)
-
-    def _enter_edit_mode(self) -> None:
-        """Mostra o markdown bruto para edição."""
-        if self._is_editing_text:
-            return
-        self._is_editing_text = True
-        self._editor.blockSignals(True)
-        self._editor.setPlainText(self._raw_content)
-        self._editor.blockSignals(False)
-
-    def _enter_preview_mode(self) -> None:
-        """Renderiza o markdown como HTML (negrito, listas, checkboxes)."""
-        self._is_editing_text = False
-        html = markdown_to_html(self._raw_content)
-        self._editor.blockSignals(True)
-        self._editor.setHtml(html)
-        self._editor.blockSignals(False)
-
     def _on_text_changed(self) -> None:
-        """Captura o texto bruto enquanto o usuário edita e agenda o save."""
-        if self._is_editing_text:
-            self._raw_content = self._editor.toPlainText()
-            self._schedule_save()
+        """Captura o HTML atual do editor e agenda o salvamento."""
+        self._raw_content = self._editor.toHtml()
+        self._schedule_save()
 
     # ------------------------------------------------------------------
     # Aparência

@@ -4,7 +4,7 @@ from app.models.note import Note
 from app.services.settings_service import DEFAULT_COLORS, SettingsService
 from app.storage.json_storage import JsonStorage
 
-# Mantido por compatibilidade com código existente que importa NOTE_COLORS
+# Mantido para compatibilidade com código existente que importa NOTE_COLORS
 # diretamente (ex: paleta padrão antes da existência do SettingsService).
 NOTE_COLORS: list[str] = DEFAULT_COLORS
 
@@ -26,7 +26,7 @@ class NoteService:
         self._color_index: int = 0
 
     # ------------------------------------------------------------------
-    # Leitura
+    # leitura
     # ------------------------------------------------------------------
 
     def get_all(self) -> list[Note]:
@@ -38,7 +38,7 @@ class NoteService:
         return next((n for n in self._notes if n.id == note_id), None)
 
     # ------------------------------------------------------------------
-    # Escrita
+    # escrita
     # ------------------------------------------------------------------
 
     def create(self, x: int = 100, y: int = 100) -> Note:

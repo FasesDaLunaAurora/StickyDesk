@@ -58,7 +58,8 @@ class SettingsDialog(QDialog):
         self.setStyleSheet(
             """
             QDialog {
-                background-color: #fafafa;
+                /* Mesma cor de fundo creme suave do container principal */
+                background-color: #fff4df; 
             }
             """
         )
@@ -71,7 +72,8 @@ class SettingsDialog(QDialog):
 
         heading = QLabel("Paleta de cores")
         heading.setFont(QFont("Segoe UI", 11, QFont.Weight.DemiBold))
-        heading.setStyleSheet("color: #2d2d2d;")
+        # Cor do título principal no marrom característico do app
+        heading.setStyleSheet("color: #a2835e; font-weight: 600;")
         layout.addWidget(heading)
 
         subtitle = QLabel(
@@ -79,7 +81,8 @@ class SettingsDialog(QDialog):
             "disponíveis nas notas."
         )
         subtitle.setFont(QFont("Segoe UI", 9))
-        subtitle.setStyleSheet("color: #777;")
+        # Subtítulo em marrom médio para manter o minimalismo sem sumir no fundo
+        subtitle.setStyleSheet("color: #c69868;")
         layout.addWidget(subtitle)
 
         swatch_row = QHBoxLayout()
@@ -95,43 +98,26 @@ class SettingsDialog(QDialog):
         restore_btn.setStyleSheet(
             """
             QPushButton {
-                background: transparent;
-                color: #555;
-                border: 1px solid #ccc;
-                border-radius: 6px;
+                /* Botão principal de ação: preenchido com o marrom de destaque */
+                background-color: #c69868;
+                color: #fff4df;
+                border: 1px solid #c69868;
+                border-radius: 14px; /* Formato pílula consistente */
                 padding: 7px 12px;
                 font-family: "Segoe UI";
                 font-size: 10pt;
+                font-weight: 500;
             }
             QPushButton:hover {
-                background: #eee;
-                border-color: #999;
+                /* Destaque sutil ao passar o mouse */
+                background-color: #a2835e;
+                border-color: #a2835e;
             }
             """
         )
         restore_btn.clicked.connect(self._restore_defaults)
         layout.addWidget(restore_btn)
 
-        close_btn = QPushButton("Fechar")
-        close_btn.setCursor(Qt.CursorShape.PointingHandCursor)
-        close_btn.setStyleSheet(
-            """
-            QPushButton {
-                background: #2d2d2d;
-                color: white;
-                border: none;
-                border-radius: 6px;
-                padding: 7px 12px;
-                font-family: "Segoe UI";
-                font-size: 10pt;
-            }
-            QPushButton:hover {
-                background: #444;
-            }
-            """
-        )
-        close_btn.clicked.connect(self.accept)
-        layout.addWidget(close_btn)
 
     def _build_swatch(self, index: int) -> QPushButton:
         """Cria um botão circular que representa um slot de cor editável."""
@@ -139,9 +125,25 @@ class SettingsDialog(QDialog):
         btn.setFixedSize(44, 44)
         btn.setCursor(Qt.CursorShape.PointingHandCursor)
         btn.setToolTip("Clique para escolher uma cor")
+        
+        # Estilização dinâmica para os círculos de cores (swatches)
+        # Adiciona uma borda fina elegante para que as cores conversem com o resto da interface
+        btn.setStyleSheet(
+            """
+            QPushButton {
+                border: 2px solid #f3e1ae;
+                border-radius: 22px; /* Metade de 44 para garantir que seja um círculo perfeito */
+            }
+            QPushButton:hover {
+                border: 2px solid #c69868; /* Destaca o slot ativo ao passar o mouse */
+            }
+            """
+        )
+        
         btn.clicked.connect(lambda _checked, i=index: self._pick_color(i))
         self._swatches.append(btn)
         return btn
+
 
     # ------------------------------------------------------------------
     # Ações
