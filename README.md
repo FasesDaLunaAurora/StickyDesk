@@ -6,7 +6,7 @@
 ![License](https://img.shields.io/badge/License-MIT-orange)
 
 > Post-its digitais para sua área de trabalho.
-> **Versão atual: v1.2.0**
+> **Versão atual: v1.3.0**
 
 StickyDesk é uma aplicação desktop desenvolvida em Python e PySide6 que permite criar post-its digitais diretamente na área de trabalho do Windows.
 
@@ -16,7 +16,9 @@ Projetado para ser leve, rápido e intuitivo, o StickyDesk ajuda a organizar lem
 
 # 📸 Demonstração
 
-![Demo do StickyDesk](assets/demo_v1.png)
+![Demo StickyDesk](assets/demo.png)
+---
+![Demo StickyDesk](assets/demo2.png)
 
 ---
 
@@ -43,7 +45,7 @@ Projetado para ser leve, rápido e intuitivo, o StickyDesk ajuda a organizar lem
 
 ---
 
-## Novidades da v1.2.0
+## Novidades da v1.3.0
 
 - 🚫 **Sem ícone na bandeja** — todo o controle do app agora passa pela janela painel e pelos botões de cada nota
 - 📋 **Painel de controle** — uma mini janela abre junto com as notas, listando os títulos de todas elas; clique em um item para restaurar/focar aquela nota
@@ -126,29 +128,38 @@ stickydesk/
 
 ```
 main.py
-  └─ instancia JsonStorage + NoteService + MainWindow
+  └─ instancia JsonStorage (notes.json) + SettingsService (settings.json)
+     + NoteService(storage, settings) + MainWindow(service, settings)
         │
-        ├─ MainWindow carrega notas com visible=True via NoteService.get_all()
-        │    └─ para cada Note visível → cria StickyNoteWidget
+        ├─ MainWindow carrega todas as notas salvas via NoteService.get_all()
+        │    ├─ se não houver nenhuma → cria uma nota em branco
+        │    └─ para cada Note → cria StickyNoteWidget(palette=settings.get_colors())
         │
-        └─ Usuário interage com StickyNoteWidget
-             ├─ on_content_change  → NoteService.update_content()   → JsonStorage.save()
-             ├─ on_title_change    → NoteService.update_title()     → JsonStorage.save()
-             ├─ on_position_change → NoteService.update_position()  → JsonStorage.save()
-             ├─ on_color_change    → NoteService.update_color()     → JsonStorage.save()
-             ├─ on_close           → NoteService.set_visibility(False) → JsonStorage.save()
-             └─ on_delete          → NoteService.delete()           → JsonStorage.save()
+        ├─ Usuário interage com StickyNoteWidget
+        │    ├─ on_content_change  → NoteService.update_content()  → JsonStorage.save()
+        │    ├─ on_title_change    → NoteService.update_title()    → JsonStorage.save() + lista
+        │    ├─ on_position_change → NoteService.update_position() → JsonStorage.save()
+        │    ├─ on_size_change     → NoteService.update_size()     → JsonStorage.save()
+        │    ├─ on_color_change    → NoteService.update_color()    → JsonStorage.save()
+        │    ├─ on_new_note        → MainWindow._create_note()     → cria + spawna novo widget
+        │    └─ on_delete          → NoteService.delete()          → JsonStorage.save() + lista
+        │
+        └─ Usuário abre configurações (⚙)
+             └─ SettingsDialog → SettingsService.set_color()/restore_defaults()
+                  → on_palette_change → MainWindow propaga para StickyNoteWidget.update_palette()
+                    em todas as notas já abertas
 ```
 ---
 
 ### Princípios seguidos
 
-- **Separação de camadas**: a UI nunca acessa o JSON diretamente
-- **Fechar vs. Excluir são operações distintas**: fechar é uma mudança de estado (`visible=False`), excluir é destrutivo e pede confirmação
-- **Debounce de auto-save**: texto e título são salvos 500 ms após parar de digitar (evita I/O excessivo)
-- **Caminho absoluto para o JSON**: funciona igual seja chamado via terminal, atalho ou outro processo
-- **DI manual em `main.py`**: dependências são compostas externamente, facilitando testes
-- **Sem estado global**: cada widget é independente e se comunica via callbacks
+- **Markdown é convertido ao digitar, não em lote**: `LiveMarkdownEditor` intercepta cada tecla e aplica negrito/itálico/lista/checkbox no instante em que o padrão é reconhecido, removendo os marcadores (`**`, `*`, `-`, `[ ]`) do texto — o resultado já é rich text, sem etapa de preview separada
+- **Resize é estado de janela, persistido explicitamente**: `width`/`height` vivem no modelo `Note` e são salvos só quando o arrasto termina (`mouseReleaseEvent`), não a cada pixel
+- **Paleta de cores é configuração, não dado de nota**: vive em `settings.json` separado; mudar a paleta não afeta a cor já escolhida de notas existentes, só as opções disponíveis para escolha futura
+- **Sem tray, sem menu de contexto**: todo controle é feito por botões visíveis nas próprias janelas
+- **Debounce de auto-save**: texto e título são salvos 500 ms após parar de digitar
+- **Persistência fora da área de instalação**: dados em AppData, nunca em Program Files
+- **DI manual em `main.py`**: dependências compostas externamente, facilitando testes
 
 ---
 
@@ -306,24 +317,15 @@ Além de resolver um problema real do dia a dia, o projeto faz parte do meu port
 * [x] Títulos
 * [x] Fechar sem excluir
 
-## Versão 1.2.0
-
-* [ ] Checklists
-* [ ] Markdown
-* [ ] Atalhos de teclado
-
 ## Versão 1.3.0
 
-* [ ] Sincronização entre dispositivos
+* [x] Checklists
+* [x] Markdown
 
 ---
 
 # 🔮 Futuras Evoluções
 
-* Sistema de temas
-* Modo escuro
-* Agrupamento de notas
-* Backup automático
 * Sincronização em nuvem
 * Integração com calendário
 * Notificações nativas do Windows
