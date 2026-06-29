@@ -2,7 +2,7 @@
 ; Compile com o Inno Setup Compiler (ISCC.exe) apontando para este arquivo.
 
 #define MyAppName "StickyDesk"
-#define MyAppVersion "1.2.0"
+#define MyAppVersion "1.3.0"
 #define MyAppPublisher "StickyDesk"
 #define MyAppExeName "StickyDesk.exe"
 
