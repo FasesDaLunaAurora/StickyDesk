@@ -219,6 +219,8 @@ O projeto possui um script centralizador que ativa o ambiente virtual, garante a
    ```
 3. O executável standalone será gerado em: `dist/StickyDesk.exe`.
 
+> **Sobre o arquivo `StickyDesk.spec`**: o PyInstaller gera esse arquivo automaticamente na primeira execução do `build.bat`. Ele guarda a "receita" da compilação (ícone, modo janela, módulos incluídos) para reuso. É artefato gerado, não código-fonte — já está no `.gitignore` e pode ser apagado/recriado sem problema a qualquer momento (basta rodar `build.bat` de novo).
+
 ### 4. Criando o Instalador Visual
 
 Para gerar o assistente de instalação final (`StickyDesk_Setup.exe`):

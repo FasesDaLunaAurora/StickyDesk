@@ -14,7 +14,7 @@ echo [2/3] Garantindo dependencias de desenvolvimento...
 python -m pip install -r requirements-dev.txt
 
 echo [3/3] Compilando executavel unico com PyInstaller...
-pyinstaller -F -w -i "assets\icon.ico" --name="StickyDesk" main.py
+pyinstaller -F -w -i "assets\icon.ico" --add-data "assets;assets" --name="StickyDesk" main.py
 
 if %errorlevel% equ 0 (
     echo.

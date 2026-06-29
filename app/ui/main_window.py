@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
 from PySide6.QtCore import QPoint, Qt
 from PySide6.QtGui import QColor, QFont, QPainter, QPainterPath, QPen, QPixmap
 from PySide6.QtWidgets import (
@@ -18,6 +16,7 @@ from PySide6.QtWidgets import (
 )
 
 from app.models.note import Note
+from app.resources import resource_path
 from app.services.note_service import NoteService
 from app.services.settings_service import SettingsService
 from app.ui.settings_dialog import SettingsDialog
@@ -29,7 +28,7 @@ _HEADER_HEIGHT = 52
 _LOGO_SIZE = 30
 
 # Caminho esperado para a logo da aplicação (fornecida futuramente pelo usuário)
-_LOGO_PATH = Path(__file__).resolve().parent.parent.parent / "assets" / "logo.png"
+_LOGO_PATH = resource_path("logo.png")
 
 
 class NoteIcon(QWidget):
@@ -166,6 +165,14 @@ class MainWindow(QWidget):
         settings_btn.clicked.connect(self._open_settings)
         layout.addWidget(settings_btn)
 
+        new_btn = QPushButton("+")
+        new_btn.setObjectName("panel_btn_new")
+        new_btn.setFixedSize(22, 22)
+        new_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        new_btn.setToolTip("Criar nova nota")
+        new_btn.clicked.connect(self._create_note)
+        layout.addWidget(new_btn)
+
         min_btn = QPushButton("—")
         min_btn.setObjectName("panel_btn_min")
         min_btn.setFixedSize(22, 22)
@@ -258,6 +265,18 @@ class MainWindow(QWidget):
             QPushButton#panel_btn_settings:hover {
                 background: #f1f1f1;
                 color: #a2835e;
+            }
+            QPushButton#panel_btn_new {
+                background: transparent;
+                border: none;
+                color: #c69868;
+                font-size: 13px;
+                font-weight: bold;
+                border-radius: 8px;
+            }
+            QPushButton#panel_btn_new:hover {
+                background: rgba(0,0,0,0.10);
+                color: rgba(0,0,0,0.80);
             }
             QPushButton#panel_btn_min {
                 background: transparent;
