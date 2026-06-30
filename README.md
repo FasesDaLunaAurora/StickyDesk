@@ -332,19 +332,20 @@ Além de resolver um problema real do dia a dia, o projeto faz parte do meu port
 
 ---
 
-# 🤝 Contribuições
+# ⭐ Apoie o Projeto
 
-Sugestões, melhorias e correções são bem-vindas.
+Se este repositório foi útil para você, considere deixar uma **⭐ Star**.
 
-Caso encontre algum problema ou tenha uma ideia para o projeto, sinta-se à vontade para abrir uma issue.
+Além de incentivar o projeto, isso ajuda outras pessoas a encontrarem este material.
 
 ---
 
 # 📄 Licença
 
-Este projeto está licenciado sob a licença MIT.
+Este projeto está licenciado sob a **MIT License**.
+
+Você pode estudar, utilizar, compartilhar e contribuir livremente.
 
 ---
-
 
 
